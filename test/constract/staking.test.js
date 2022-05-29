@@ -1,6 +1,6 @@
 const { ethers, deployments } = require("hardhat");
-const { moveBlocks } = require("../utils/move-block");
-const { moveTime } = require("../utils/move-time");
+const { moveBlocks } = require("../../utils/move-block");
+const { moveTime } = require("../../utils/move-time");
 
 const SECONDS_IN_A_DAY = 86400;
 const SECONDS_IN_A_YEAR = 86400 * 365;

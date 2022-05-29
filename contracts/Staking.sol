@@ -140,4 +140,8 @@ contract Staking is ReentrancyGuard {
         //
         // Why not 1 to 1? - brankupt your protocal
     }
+
+    function getStaked(address _account) public view returns(uint256) {
+        return s_balances[_account];
+    }
 }

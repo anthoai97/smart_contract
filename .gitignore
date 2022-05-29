@@ -11,6 +11,10 @@
 # production
 /build
 
+# next.js
+/.next/
+/out/
+
 # misc
 .DS_Store
 .env.local
@@ -27,6 +31,7 @@ node_modules
 coverage
 coverage.json
 typechain
+deployments
 
 #Hardhat files
 cache
