@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { rewardTokenAbi, rewardTokenAddress, stakingAbi, stakingAdress } from "../constants";
 import { ethers } from "ethers";
 import StakeForm from "./StakeForm";
+import { Button } from "web3uikit";
 
 export default function StakeDetails() {
     const { account, isWeb3Enabled } = useMoralis();
@@ -19,6 +20,16 @@ export default function StakeDetails() {
         },
     });
 
+    const { runContractFunction: mintToken } = useWeb3Contract({
+        abi: rewardTokenAbi.abi,
+        contractAddress: rewardTokenAddress,
+        functionName: "mint",
+        params: {
+            _account: account,
+            _amount: ethers.utils.parseUnits("10000", "ether").toString(),
+        },
+    });
+
     const { runContractFunction: getStakedBalance } = useWeb3Contract({
         abi: stakingAbi.abi,
         contractAddress: stakingAdress,
@@ -26,7 +37,7 @@ export default function StakeDetails() {
         params: { _account: account },
     });
 
-    const {runContractFunction: getEarnedBalance} = useWeb3Contract({
+    const { runContractFunction: getEarnedBalance } = useWeb3Contract({
         abi: stakingAbi.abi,
         contractAddress: stakingAdress,
         functionName: "earned",
@@ -39,6 +50,14 @@ export default function StakeDetails() {
             updateUiValues();
         }
     }, [account, isWeb3Enabled]);
+
+    async function fauceToken() {
+        const tx = await mintToken();
+
+        await tx.wait(1);
+        updateUiValues();
+        console.log(`Mint successful....`);
+    }
 
     async function updateUiValues() {
         const rtBalanceFromContract = await getRtBalance({
@@ -70,7 +89,10 @@ export default function StakeDetails() {
 
     return (
         <div>
-            <div>RT balance is: {rtBalance}</div>
+            <div className="flex align-center items-center">
+                <div className="mr-5">RT balance is: {rtBalance}</div>
+                <Button text="Fauce RT Token" onClick={fauceToken} />
+            </div>
             <div>Earned balance is: {earnedBalance}</div>
             <div>Staked balance is: {stakedBalance}</div>
             <StakeForm />
