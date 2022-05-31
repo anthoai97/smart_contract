@@ -1,7 +1,8 @@
 const { ethers, network } = require("hardhat");
-const { developmentChains, networkConfig } = require("../../helper-hardhat-config");
+const { developmentChains, networkConfig, VERIFICATION_BLOCK_CONFIRMATIONS } = require("../../helper-hardhat-config");
 
 const FUND_AMOUNT = "1000000000000000000000";
+const { verify } = require("../../utils/verify");
 
 module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
     const { deploy, log } = deployments;
@@ -22,6 +23,9 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
         // Fund the subscription
         // Our mock makes it so we don't actually have to worry about sending fund
         await vrfCoordinatorV2Mock.fundSubscription(subscriptionId, FUND_AMOUNT);
+    } else {
+        vrfCoordinatorV2Address = networkConfig[chainId]["vrfCoordinatorV2Address"];
+        subscriptionId = networkConfig[chainId]["subscriptionId"];
     }
 
     const waitBlockConfirmations = developmentChains.includes(network.name)
@@ -44,6 +48,12 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
         log: true,
         waitBlockConfirmations: waitBlockConfirmations,
     });
+
+    // Verify the deployment
+    if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
+        log("Verifying...");
+        await verify(raffle.address, args);
+    }
 };
 
 module.exports.tags = ["all", "raffle"];
